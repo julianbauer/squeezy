@@ -2,10 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .shopify-buy__btn {
+    color: blue
+  }
+}
+
 @font-face {
   font-family: "Squeezy";
   src: url("/fonts/SqueezyVF.woff2");
   font-display: block;
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'TT_Neoris';
+  src: url('/fonts/TT_Neoris_Variable.woff2');
 }
 
 *::selection {
@@ -14,70 +26,64 @@
 }
 
 :root {
-  --red-background: #ff2b2b;
-  --red-foreground: #e3ff73;
-  --red-foreground-shade-30: #ff6a29;
-  --red-foreground-shade-20: #ff5529;
-  --red-foreground-shade-10: #ff3f2a;
+  --background: #009460;
+  --foreground: #FFD56C;
+  --foreground-shade-30: #4DA864;
+  --foreground-shade-20: #33A162;
+  --foreground-shade-10: #199B61;
+}
 
-  --blue-background: #73bcff;
-  --blue-foreground: #ff2a5e;
-  --blue-foreground-shade-30: #9d96eb;
-  --blue-foreground-shade-20: #8fa3f2;
-  --blue-foreground-shade-10: #81aff8;
-
-  --pink-background: #ff2a5e;
-  --pink-foreground: #73bcff;
-  --pink-foreground-shade-30: #f8488e;
-  --pink-foreground-shade-20: #fa3e7e;
-  --pink-foreground-shade-10: #fd346e;
-
-  --black-background: #000;
-  --black-foreground: #fff;
-  --black-foreground-shade-30: #333333;
-  --black-foreground-shade-20: #1a1a1a;
-  --black-foreground-shade-10: #0d0d0d;
-
-  --background: var(--red-background);
-  --foreground: var(--red-foreground);
-  --foreground-shade-30: var(--red-foreground-shade-30);
-  --foreground-shade-20: var(--red-foreground-shade-20);
-  --foreground-shade-10: var(--red-foreground-shade-10);
+html {
+  font-family: 'TT_Neoris, sans-serif';
+  font-feature-settings: 'ss05' on;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
+  font-variation-settings: 'ital' 1;
 }
 
 body {
+  font-family: 'TT_Neoris, sans-serif';
+  font-feature-settings: 'ss05' on;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
+  font-weight: 480;
+  font-variation-settings: 'ital' 1;
   background: var(--background);
   color: var(--foreground);
 
-  &.red {
-    --background: var(--red-background);
-    --foreground: var(--red-foreground);
-    --foreground-shade-30: var(--red-foreground-shade-30);
-    --foreground-shade-20: var(--red-foreground-shade-20);
-    --foreground-shade-10: var(--red-foreground-shade-10);
+  /* THEMES */
+
+  &.yellowRed {
+    --background: #EF3A33;
+    --foreground: #E9FF95;
+    --foreground-shade-30: #ED7F55;
+    --foreground-shade-20: #ED6B4C;
+    --foreground-shade-10: #EE5842;
   }
 
-  &.blue {
-    --background: var(--blue-background);
-    --foreground: var(--blue-foreground);
-    --foreground-shade-30: var(--blue-foreground-shade-30);
-    --foreground-shade-20: var(--blue-foreground-shade-20);
-    --foreground-shade-10: var(--blue-foreground-shade-10);
+  &.yellowPurple {
+    --background: #B200A1;
+    --foreground: #FFD56C;
+    --foreground-shade-30: #CD4B8E;
+    --foreground-shade-20: #C53594;
+    --foreground-shade-10: #BE2099;
+  }
+  
+  &.yellowGreen {
+    --background: #009460;
+    --foreground: #FFD56C;
+    --foreground-shade-30: #4DA864;
+    --foreground-shade-20: #33A162;
+    --foreground-shade-10: #199B61;
   }
 
-  &.pink {
-    --background: var(--pink-background);
-    --foreground: var(--pink-foreground);
-    --foreground-shade-30: var(--pink-foreground-shade-30);
-    --foreground-shade-20: var(--pink-foreground-shade-20);
-    --foreground-shade-10: var(--pink-foreground-shade-10);
-  }
-
-  &.black {
-    --background: var(--black-background);
-    --foreground: var(--black-foreground);
-    --foreground-shade-30: var(--black-foreground-shade-30);
-    --foreground-shade-20: var(--black-foreground-shade-20);
-    --foreground-shade-10: var(--black-foreground-shade-10);
+  &.yellowBlue {
+    --background: #1B2B79;
+    --foreground: #FFF36E;
+    --foreground-shade-30: #5F6776;
+    --foreground-shade-20: #495377;
+    --foreground-shade-10: #323F78;
   }
 }

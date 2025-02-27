@@ -2,35 +2,64 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
-import styles from "../page.module.css";
+import styles from "./grid.module.css";
 
 const fullLetterSet = [
   "A",
+  "Ä",
+  "Á",
+  "À",
+  "Â",
+  "Ã",
   "B",
   "C",
   "D",
   "E",
+  "É",
+  "È",
+  "Ê",
   "F",
   "G",
   "H",
   "I",
+  "Ï",
+  "Í",
+  "Ì",
+  "Î",
   "J",
   "K",
   "L",
   "M",
   "N",
+  "Ñ",
   "O",
+  "Ö",
+  "Ó",
+  "Ò",
+  "Ô",
+  "Õ",
   "P",
   "Q",
   "R",
   "S",
   "T",
   "U",
+  "Ü",
+  "Ú",
+  "Ù",
+  "Û",
   "V",
   "W",
   "X",
   "Y",
   "Z",
+  ".",
+  ",",
+  ":",
+  ";",
+  "-",
+  "–",
+  "—",
 ];
 const narrowLetters = ["I"];
 const wideLetters = ["M", "T", "W"];
@@ -109,7 +138,8 @@ export default function Grid({
   gyroPermissionGranted,
 }) {
   const [currentLetter, setCurrentLetter] = useState("A");
-  const [currentWidth, setCurrentWidth] = useState();
+  const [currentWidth, setCurrentWidth] = useState(400);
+  const [letterClientWidth, setLetterClientWidth] = useState(400);
   const [snappedWidth, setSnappedWidth] = useState();
 
   const showcaseSectionRef = useRef(null);
@@ -118,17 +148,17 @@ export default function Grid({
   // Width to height ratios 400 / 700
   const ratios = {
     narrow: {
-      min: 0.3547232,
-      max: 0.5838095,
+      min: 0.2775,
+      max: 0.525,
     },
 
     regular: {
-      min: 0.6080125,
-      max: 1.0880125,
+      min: 0.585,
+      max: 1.0695,
     },
     wide: {
-      min: 1.0141055,
-      max: 1.8036036,
+      min: 0.887,
+      max: 1.6125,
     },
   };
 
@@ -152,11 +182,11 @@ export default function Grid({
       min = ratios.regular.min;
       max = ratios.regular.max;
     }
+    showcaseSection.style.setProperty("--min", min);
+    showcaseSection.style.setProperty("--max", max);
 
     let height = currentLetterRef.current.getBoundingClientRect().height;
     const ratio = 300 / ((height * max - height * min) / 2);
-
-    console.log(currentLetter, min);
 
     const handleMouseMove = (e) => {
       x = Math.abs(center - e.clientX);
@@ -167,13 +197,23 @@ export default function Grid({
       const snappedWidth = snappedWidths.reduce(function (prev, curr) {
         return Math.abs(curr - width) < Math.abs(prev - width) ? curr : prev;
       });
-
       setSnappedWidth(snappedWidth);
-      console.log(currentWidth, snappedWidth);
 
       if (delta >= 0 && delta <= (height * max - height * min) / 2) {
         setCurrentWidth(width);
+      } else if (delta < 0) {
+        setCurrentWidth(400);
+      } else if (delta > (height * max - height * min) / 2) {
+        setCurrentWidth(700);
       }
+      setLetterClientWidth(
+        currentLetterRef.current.getBoundingClientRect().width
+      );
+    };
+
+    const handleMouseLeave = (e) => {
+      // setSnappedWidth(700);
+      // setCurrentWidth(700);
     };
 
     const handleResize = () => {
@@ -184,6 +224,12 @@ export default function Grid({
     if (!isMobile) {
       showcaseSection &&
         showcaseSection.addEventListener("mousemove", handleMouseMove);
+
+      currentLetterRef.current &&
+        currentLetterRef.current.addEventListener(
+          "mouseleave",
+          handleMouseLeave
+        );
     }
 
     window.addEventListener("resize", handleResize);
@@ -191,6 +237,12 @@ export default function Grid({
     return () => {
       showcaseSection &&
         showcaseSection.removeEventListener("mousemove", handleMouseMove);
+
+      currentLetterRef.current &&
+        currentLetterRef.current.removeEventListener(
+          "mouseleave",
+          handleMouseLeave
+        );
       window.removeEventListener("resize", handleResize);
     };
   });
@@ -200,17 +252,44 @@ export default function Grid({
       setSnappedWidth(extSnappedWidth);
       setCurrentWidth(extCurrentWidth);
     }
-  }, [extSnappedWidth, extCurrentWidth]);
+  }, [extSnappedWidth, extCurrentWidth, gyroPermissionGranted]);
+
+  const showWidthTicks = useRef({
+    opacity: "1",
+  });
+  const symbols = [".", ",", ";", ":", "-", "_", "–", "—"];
+
+  useEffect(() => {
+    if (symbols.includes(currentLetter)) {
+      showWidthTicks.current = {
+        opacity: "0",
+      };
+    } else {
+      showWidthTicks.current = {
+        opacity: "1",
+      };
+    }
+  }, [currentLetter, showWidthTicks, symbols]);
 
   return (
-    <section className={styles.gridContainer}>
+    <section id="grid" data-index="2" className={styles.gridContainer}>
       <div className={styles.grid}>
         {fullLetterSet.map((letter, key) => {
           return (
             <div
-              className={styles.gridItem}
+              className={`${styles.gridItem} ${
+                currentLetter === letter ? styles.active : ""
+              }`}
               key={key}
-              onClick={() => setCurrentLetter(letter)}
+              onClick={() => {
+                setCurrentLetter(letter);
+                setTimeout(() => {
+                  // Update letter width for wide letter guide lines
+                  setLetterClientWidth(
+                    currentLetterRef.current.getBoundingClientRect().width
+                  );
+                }, 10);
+              }}
             >
               {letter}
             </div>
@@ -218,7 +297,7 @@ export default function Grid({
         })}
       </div>
       <div
-        className={`${styles.gridShowcase} ${
+        className={`select-none ${styles.gridShowcase} ${
           narrowLetters.includes(currentLetter) ? styles.narrow : ""
         } ${wideLetters.includes(currentLetter) ? styles.wide : ""}`}
         ref={showcaseSectionRef}
@@ -284,7 +363,11 @@ export default function Grid({
                 transform:
                   wideLetters.includes(currentLetter) &&
                   doubleSlitLetters.includes(currentLetter)
-                    ? `translate(${-0.1666 * (currentWidth / 400)}em, -50%)`
+                    ? `translate(calc(
+                      -${(letterClientWidth - 14) * 0.5}px
+                      + ${(letterClientWidth - 14) * 0.324}px
+                      - ${(1 - (currentWidth - 400) / 300) * 5}px
+                    ), -50%)`
                     : null,
               }}
             ></div>
@@ -294,7 +377,11 @@ export default function Grid({
                 transform:
                   wideLetters.includes(currentLetter) &&
                   doubleSlitLetters.includes(currentLetter)
-                    ? `translate(${-0.1433 * (currentWidth / 400)}em, -50%)`
+                    ? `translate(calc(
+                      -${(letterClientWidth - 14) * 0.5}px
+                      + ${(letterClientWidth - 14) * 0.338}px
+                      + ${(1 - (currentWidth - 400) / 300) * 2}px
+                    ), -50%)`
                     : null,
               }}
             ></div>
@@ -304,7 +391,11 @@ export default function Grid({
                 transform:
                   wideLetters.includes(currentLetter) &&
                   doubleSlitLetters.includes(currentLetter)
-                    ? `translate(${0.1633 * (currentWidth / 400)}em, -50%)`
+                    ? `translate(calc(
+                      -${(letterClientWidth - 14) * 0.5}px
+                      + ${(letterClientWidth - 14) * 0.675}px
+                      + ${(1 - (currentWidth - 400) / 300) * 4}px
+                    ), -50%)`
                     : null,
               }}
             ></div>
@@ -314,7 +405,11 @@ export default function Grid({
                 transform:
                   wideLetters.includes(currentLetter) &&
                   doubleSlitLetters.includes(currentLetter)
-                    ? `translate(${0.14 * (currentWidth / 400)}em, -50%)`
+                    ? `translate(calc(
+                    -${(letterClientWidth - 14) * 0.5}px
+                    + ${(letterClientWidth - 14) * 0.6615}px
+                    - ${(1 - (currentWidth - 400) / 300) * 2}px
+                  ), -50%)`
                     : null,
               }}
             ></div>
@@ -322,26 +417,31 @@ export default function Grid({
             <div className={styles.outerBottom}></div>
           </div>
         </div>
-        <p className={styles.width}>{snappedWidth}</p>
-        <div className={styles.widthLinesLeft}>
-          {snappedWidths.map((width, key) => (
-            <div
-              className={`${styles.widthLine} ${
-                width === snappedWidth ? styles.active : ""
-              }`}
-              key={key}
-            ></div>
-          ))}
-        </div>
-        <div className={styles.widthLinesRight}>
-          {snappedWidths.map((width, key) => (
-            <div
-              className={`${styles.widthLine} ${
-                width === snappedWidth ? styles.active : ""
-              }`}
-              key={key}
-            ></div>
-          ))}
+
+        <div className={styles.widthContainer} style={showWidthTicks.current}>
+          {/* WIDTH VALUE! */}
+          <p className={styles.width}>{Math.round(currentWidth)}</p>
+          {/* ------------ */}
+          <div className={styles.widthLinesLeft}>
+            {snappedWidths.map((width, key) => (
+              <div
+                className={`${styles.widthLine} ${
+                  width === snappedWidth ? styles.active : ""
+                }`}
+                key={key}
+              ></div>
+            ))}
+          </div>
+          <div className={styles.widthLinesRight}>
+            {snappedWidths.map((width, key) => (
+              <div
+                className={`${styles.widthLine} ${
+                  width === snappedWidth ? styles.active : ""
+                }`}
+                key={key}
+              ></div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
